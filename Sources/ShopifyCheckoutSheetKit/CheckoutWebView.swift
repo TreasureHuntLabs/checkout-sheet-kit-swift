@@ -116,6 +116,8 @@ class CheckoutWebView: WKWebView {
 		if #available(iOS 15.0, *) {
 			underPageBackgroundColor = ShopifyCheckoutSheetKit.configuration.backgroundColor
 		}
+		
+		Task { await self.clearCookies(configuration.websiteDataStore) }
 	}
 
 	deinit {
@@ -147,6 +149,11 @@ class CheckoutWebView: WKWebView {
 			CheckoutBridge.sendMessage(self, messageName: "presented", messageBody: nil)
 			presentedEventDidDispatch = true
 		}
+	}
+	
+	private func clearCookies(_ dataStore: WKWebsiteDataStore) async  {
+		let records = await dataStore.dataRecords(ofTypes: [WKWebsiteDataTypeCookies])
+		await dataStore.removeData(ofTypes: [WKWebsiteDataTypeCookies], for: records)
 	}
 }
 
